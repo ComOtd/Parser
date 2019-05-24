@@ -37,4 +37,13 @@ public class Film {
     public void setLink(String link) {
         this.link = link;
     }
+
+    @Override
+    public String toString() {
+        return "Film{" +
+                "name='" + name + '\'' +
+                ", size='" + size + '\'' +
+                ", link='" + link + '\'' +
+                "}\n";
+    }
 }

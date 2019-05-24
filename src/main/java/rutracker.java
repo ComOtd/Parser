@@ -19,7 +19,7 @@ public class rutracker {
         try {
             Proxy proxy = new Proxy(
                     Proxy.Type.HTTP,
-                    InetSocketAddress.createUnresolved("183.179.199.232", 8080)
+                    InetSocketAddress.createUnresolved("35.222.1.33", 8080)
             );
             Connection.Response response = Jsoup.connect("https://rutracker.org/forum/login.php")
                     .proxy(proxy)
@@ -39,21 +39,29 @@ public class rutracker {
 
             String name = "Миссия%20невыполнима%20Последствия";
             String url = "https://rutracker.org/forum/tracker.php?f=313&nm=" + name;
+            double flashSize = 14;
 
 
             Document doc = Jsoup.connect(url)
                     .proxy(proxy)
                     .cookies(response.cookies())
                     .get();
-            Elements aElements = doc.select(".tCenter hl-tr");
-            List<Film> films = new ArrayList<>();
-            for (Element aElement : aElements) {
-                Film film = new Film();
-                film.setName(aElement);
-                film.setSize(aElement);
-                film.setLink(aElement);
 
-            }
+            ;
+            Elements elements = doc.getElementsByClass("tCenter hl-tr");
+            System.out.println(elements);
+            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+
+            List<Film> films = new ArrayList<>();
+
+           for (Element element : elements) {
+               String fname = (element.select("a[class = med tLink hl-tags bold]").text());
+               String fsize = (element.select("a[class = small tr-dl dl-stub]").text().replace("↓",""));
+               String link = ("https://rutracker.org/forum/"+element.select("a[class = med tLink hl-tags bold]").attr("href"));
+               double size  =  Double.parseDouble(fsize.replaceAll("[a-zA-Z]+",""));
+               if(size < flashSize) films.add(new Film(fname, fsize, link));
+           }
+            System.out.println(films);
 
         } catch (IOException e) {
             e.printStackTrace();
