@@ -15,6 +15,14 @@ public class rutracker {
 
     public static void main(String[] args) {
 
+        String findWord = "Миссия невыполнима Последствия";
+        double flashSize = 14;
+        ProxyChecker checker = new ProxyChecker("https://rutracker.org");
+        List<Proxy>proxyList=new ArrayList<>();
+        proxyList = checker.checkProxyFromFile("C:\\Users\\Семён\\Documents\\1.txt");
+        System.out.println(proxyList);
+
+
 
         try {
             Proxy proxy = new Proxy(
@@ -37,29 +45,28 @@ public class rutracker {
                     .execute();
 
 
-            String name = "Миссия%20невыполнима%20Последствия";
-            String url = "https://rutracker.org/forum/tracker.php?f=313&nm=" + name;
-            double flashSize = 14;
 
-
-            Document doc = Jsoup.connect(url)
+            String filmHdUrl = "https://rutracker.org/forum/tracker.php?f=313&nm=" + findWord;
+            Document doc = Jsoup.connect(filmHdUrl)
                     .proxy(proxy)
                     .cookies(response.cookies())
                     .get();
 
-            ;
-            Elements elements = doc.getElementsByClass("tCenter hl-tr");
-            System.out.println(elements);
-            System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
+            Elements elements = doc.getElementsByClass("tCenter hl-tr");
             List<Film> films = new ArrayList<>();
 
            for (Element element : elements) {
-               String fname = (element.select("a[class = med tLink hl-tags bold]").text());
-               String fsize = (element.select("a[class = small tr-dl dl-stub]").text().replace("↓",""));
-               String link = ("https://rutracker.org/forum/"+element.select("a[class = med tLink hl-tags bold]").attr("href"));
-               double size  =  Double.parseDouble(fsize.replaceAll("[a-zA-Z]+",""));
-               if(size < flashSize) films.add(new Film(fname, fsize, link));
+
+               String name = (element.select("a[class = med tLink hl-tags bold]").text());
+               name = name.substring(0, name.indexOf("("));
+               String fsize = (element.select("a[class = small tr-dl dl-stub]").text()
+                       .replaceAll("[a-zA-Z]+","").replace("↓",""));
+               String link = ("https://rutracker.org/forum/"+element.select("a[class = med tLink hl-tags bold]")
+                       .attr("href"));
+               double size  =  Double.parseDouble(fsize);
+
+               if(size < flashSize) films.add(new Film(name, size, link));
            }
             System.out.println(films);
 
