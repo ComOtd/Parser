@@ -1,7 +1,7 @@
 import Entity.Content;
 import Proxy.ProxyParser;
 import Proxy.ProxyChecker;
-import Torrents.TorrentRutracker;
+import Torrents.TorrentParserRutracker;
 import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.net.Proxy;
@@ -17,7 +17,7 @@ public class Parser {
 
         String findWord = "Миссия невыполнима Последствия";
         double flashSize = 50;
-        String param = "1";
+        String param = "2";
 
         switch (param) {
             case "1":
@@ -45,7 +45,7 @@ public class Parser {
 
                 for (Proxy p : proxies) {
                     try {
-                        TorrentRutracker rutracker = new TorrentRutracker("SOsipov", "wHRx8", p, "Film");
+                        TorrentParserRutracker rutracker = new TorrentParserRutracker("SOsipov", "wHRx8", p, "Film");
                         doc = rutracker.getSerchPage(findWord);
                         contents = rutracker.parsPage(doc, flashSize);
                         break;
@@ -54,9 +54,7 @@ public class Parser {
                         System.out.println(e.getMessage());
                         System.out.println("Exception was processed. Program continues");
                     }
-
                 }
-
                 System.out.println(contents);
                 break;
         }

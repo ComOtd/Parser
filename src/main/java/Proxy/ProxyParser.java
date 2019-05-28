@@ -34,7 +34,6 @@ public class ProxyParser {
         regex = regexes[regexID];
     }
 
-
     public List<String> parseByUrl(String url) {
         List<String> ip = new ArrayList<>();
         try {

@@ -24,29 +24,19 @@ enum ContentType {
     String title;
 }
 
-
-@FieldDefaults(makeFinal=true, level= AccessLevel.PRIVATE)
-@AllArgsConstructor
-public class TorrentRutracker implements Torrent<Content> {
-
-
-    @Getter
-    String LOGIN;
-    @Getter
-    String PASSWORD;
-    @Getter
-    Proxy proxy;
-    @Getter
-    String content;
-
+public class TorrentParserRutracker extends TorrentParserImp {
+    
+    public TorrentParserRutracker(String LOGIN, String PASSWORD, Proxy proxy, String content) {
+        super(LOGIN, PASSWORD, proxy, content);
+    }
 
     @Override
     public Map<String, String> getLoginCookies() throws IOException {
         Connection.Response response  = Jsoup.connect("https://rutracker.org/forum/login.php")
-                .proxy(proxy)
+                .proxy(getProxy())
                 .referrer("https://rutracker.org/forum/login.php")
-                .data("login_username", LOGIN)
-                .data("login_password", PASSWORD)
+                .data("login_username", getLOGIN())
+                .data("login_password", getPASSWORD())
                 .data("login", "")
                 .method(Connection.Method.POST)
                 .execute();
@@ -55,14 +45,13 @@ public class TorrentRutracker implements Torrent<Content> {
 
     @Override
     public Document getSerchPage(String findWord) throws IOException {
-        String url = ContentType.valueOf(content).getTitle() + findWord;
+        String url = ContentType.valueOf(getContent()).getTitle() + findWord;
         return Jsoup.connect(url)
-                .proxy(proxy)
+                .proxy(getProxy())
                 .cookies(getLoginCookies())
                 .get();
     }
-
-
+    
     @Override
     public List<Content> parsPage(Document doc, double maxSize) {
         Elements elements = doc.select("tr[class = tCenter hl-tr]");
@@ -75,7 +64,7 @@ public class TorrentRutracker implements Torrent<Content> {
                     .attr("href");
             if (fsize.isEmpty()) continue;
             double size = Double.parseDouble(fsize);
-            if (size < maxSize) contents.add(new Content(name, size, link, content));
+            if (size < maxSize) contents.add(new Content(name, size, link, getContent()));
         }
         return contents;
     }
