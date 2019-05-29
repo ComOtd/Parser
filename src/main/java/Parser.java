@@ -15,7 +15,7 @@ public class Parser {
     public static void main(String[] args) {
 
         String findWord = "Миссия невыполнима Последствия";
-        double flashSize = 50;
+        double flashSize = 14;
         String param = "2";
 
         switch (param) {
