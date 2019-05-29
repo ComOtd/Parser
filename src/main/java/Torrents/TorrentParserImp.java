@@ -20,7 +20,7 @@ public abstract class TorrentParserImp{
     @Getter
     String PASSWORD;
     @Getter
-    Proxy proxy;
+    List<Proxy> proxy;
     @Getter
     String content;
 

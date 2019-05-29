@@ -26,30 +26,48 @@ enum ContentType {
 
 public class TorrentParserRutracker extends TorrentParserImp {
     
-    public TorrentParserRutracker(String LOGIN, String PASSWORD, Proxy proxy, String content) {
+    public TorrentParserRutracker(String LOGIN, String PASSWORD, List<Proxy> proxy, String content) {
         super(LOGIN, PASSWORD, proxy, content);
     }
 
     @Override
-    public Map<String, String> getLoginCookies() throws IOException {
-        Connection.Response response  = Jsoup.connect("https://rutracker.org/forum/login.php")
-                .proxy(getProxy())
-                .referrer("https://rutracker.org/forum/login.php")
-                .data("login_username", getLOGIN())
-                .data("login_password", getPASSWORD())
-                .data("login", "")
-                .method(Connection.Method.POST)
-                .execute();
+    public Map<String, String> getLoginCookies() {
+        Connection.Response response = null;
+        for (Proxy proxy : getProxy()) {
+           try {
+               response = Jsoup.connect("https://rutracker.org/forum/login.php")
+                       .proxy(proxy)
+                       .referrer("https://rutracker.org/forum/login.php")
+                       .data("login_username", getLOGIN())
+                       .data("login_password", getPASSWORD())
+                       .data("login", "")
+                       .method(Connection.Method.POST)
+                       .execute();
+                        break;
+           }catch (IOException e){System.out.println(proxy);
+               System.out.println(e.getMessage());
+               System.out.println("Exception was processed. Program continues");
+           }
+        }
         return response.cookies();
     }
 
     @Override
-    public Document getSerchPage(String findWord) throws IOException {
+    public Document getSerchPage(String findWord) {
+        Document doc = null;
+        for (Proxy proxy : getProxy()) {
+            try {
         String url = ContentType.valueOf(getContent()).getTitle() + findWord;
-        return Jsoup.connect(url)
-                .proxy(getProxy())
+                doc = Jsoup.connect(url)
+                .proxy(proxy)
                 .cookies(getLoginCookies())
                 .get();
+                break;
+            }catch (IOException e){System.out.println(proxy);
+                System.out.println(e.getMessage());
+                System.out.println("Exception was processed. Program continues");
+            }
+        }return doc;
     }
     
     @Override
