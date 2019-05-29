@@ -1,21 +1,25 @@
 package Proxy;
 
-import Utils.FileProcessor;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.SocketAddress;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.regex.Matcher;
+import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ProxyUtil {
     public static List<Proxy> proxyFileToList(String path){
-        List<String> list = FileProcessor.getListFromFile(path);
-        List<Proxy> proxylist = new ArrayList<>();
-        for (String l : list) {
-            Proxy proxy = stringToProxy(l);
-            proxylist.add(proxy);
+        List<Proxy> proxylist = null;
+        try {
+            proxylist =  Files.lines(Paths.get(path))
+                    .map(ProxyUtil::stringToProxy)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return proxylist;
     }
@@ -27,21 +31,16 @@ public class ProxyUtil {
     }
 
     static Proxy stringToProxy(String string){
-        String pHost ="";
-        int pPort = 0;
-        String pType="";
-
         Pattern hostPattern = Pattern.compile("\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}");
         Pattern portPattern = Pattern.compile(":\\d{2,4}");
         Pattern typePattern = Pattern.compile("[A-Z]{4,5}");
-        Matcher hostMatcher = hostPattern.matcher(string);
-        Matcher portMatcher = portPattern.matcher(string);
-        Matcher typeMatcher = typePattern.matcher(string);
 
-        if(hostMatcher.find())pHost = hostMatcher.group();
-        if(portMatcher.find())pPort = Integer.parseInt(portMatcher.group().replace(":",""));
-        if(typeMatcher.find())pType = typeMatcher.group();
-
-        return getProxy(pHost, pPort, pType);
+        String pHost = hostPattern.matcher(string).results().map(MatchResult::group).collect(Collectors.joining());
+        String pPort = portPattern.matcher(string).results().map(MatchResult::group)
+                .map(text -> text.replace(":", ""))
+                .collect(Collectors.joining());
+        int port = Integer.parseInt(pPort);
+        String pType = typePattern.matcher(string).results().map(MatchResult::group).collect(Collectors.joining());
+        return getProxy(pHost, port, pType);
     }
 }

@@ -3,15 +3,14 @@ package Proxy;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
+import java.util.Objects;
+import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
-
+import java.util.stream.Collectors;
 
 @FieldDefaults(makeFinal=true, level= AccessLevel.PRIVATE)
 public class ProxyParser {
@@ -22,7 +21,7 @@ public class ProxyParser {
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
                     "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
                     "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-                    "([01]?\\d\\d?|2[0-4]\\d|25[0-5]):([0-9]?[0-9]?[0-9]?[0-9][0-9])",
+                    "([01]?\\d\\d?|2[0-4]\\d|25[0-5]):([8]?[0]?[8][0])",
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
                     "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
                     "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
@@ -34,25 +33,23 @@ public class ProxyParser {
         regex = regexes[regexID];
     }
 
-    public List<String> parseByUrl(String url) {
-        List<String> ip = new ArrayList<>();
-        try {
-            Document doc = Jsoup.connect(url)
-                    .method(Connection.Method.GET)
-                    .get();
-            String text = doc.html();
-            Pattern patternIP = Pattern.compile(regex);
-            Matcher matcher = patternIP.matcher(text);
-            while (matcher.find()) {
-                int start = matcher.start();
-                int end = matcher.end();
-                String line = text.substring(start, end) + "\tHTTP";
-                ip.add(line);
+    public List<String> parseByUrl(List<String> urls) {
+        Pattern patternIP = Pattern.compile(regex);
+        return urls.parallelStream().map(url ->{
+            try {
+                return Jsoup.connect(url).get();
+            } catch (IOException e) {
+                return null;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return ip;
+        })
+                .filter(Objects::nonNull)
+                .map(Element::html)
+                .flatMap(text -> patternIP.matcher(text).results())
+                .map(MatchResult::group)
+                .distinct()
+                .map(text -> text + "\tHTTP")
+                .collect(Collectors.toList());
     }
+
 }
 

@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 
 import static Proxy.ProxyUtil.proxyFileToList;
@@ -17,37 +17,33 @@ public class Parser {
 
         String findWord = "Миссия невыполнима Последствия";
         double flashSize = 50;
-        String param = "2";
+        String param = "1";
 
         switch (param) {
             case "1":
+                long startTime = System.currentTimeMillis();
 
-                List<String> proxy = new ArrayList<>();
-                List<String> url = new ArrayList<>();
-                url.add("https://getfreeproxylists.blogspot.com/");
-                url.add("http://free-proxy-server.net/");
+                List<String> urls = new ArrayList<>();
+                urls.add("https://getfreeproxylists.blogspot.com/");
+                urls.add("http://free-proxy-server.net/");
+
                 ProxyParser proxyParser = new ProxyParser(0);
-
-                for (String s : url) {
-                    proxy.addAll(proxyParser.parseByUrl(s));
-                }
-                proxy = proxy.stream().distinct().collect(Collectors.toList());
-
                 ProxyChecker checker = new ProxyChecker("https://rutracker.org");
-                checker.checkProxyAndSaveToFile(proxy, 3);
+                checker.checkProxyAndSaveToFile(proxyParser.parseByUrl(urls));
+
+                long timeSpent = System.currentTimeMillis() - startTime;
+                System.out.println("программа выполнялась " + (timeSpent/1000) + " секунд");
                 break;
 
-
             case "2":
-                Document doc = null;
+                startTime = System.currentTimeMillis();
                 List<Proxy> proxies = proxyFileToList("src/tmp/out.txt");
-                List<Content> contents = new ArrayList<>();
-
                 for (Proxy p : proxies) {
                     try {
                         TorrentParserRutracker rutracker = new TorrentParserRutracker("SOsipov", "wHRx8", p, "Film");
-                        doc = rutracker.getSerchPage(findWord);
-                        contents = rutracker.parsPage(doc, flashSize);
+                        Document doc = rutracker.getSerchPage(findWord);
+                        List<Content> contents = rutracker.parsPage(doc, flashSize);
+                        System.out.println(contents);
                         break;
                     } catch (IOException e) {
                         System.out.println(p);
@@ -55,7 +51,11 @@ public class Parser {
                         System.out.println("Exception was processed. Program continues");
                     }
                 }
-                System.out.println(contents);
+
+                timeSpent = System.currentTimeMillis() - startTime;
+                System.out.println("программа выполнялась " + (timeSpent/1000) + " секунд");
                 break;
+            default:
+
         }
     }}

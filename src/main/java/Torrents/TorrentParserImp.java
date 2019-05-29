@@ -14,7 +14,7 @@ import java.util.Map;
 
 @FieldDefaults(makeFinal=true, level= AccessLevel.PRIVATE)
 @AllArgsConstructor
-public abstract class TorrentParserImp implements TorrentParser {
+public abstract class TorrentParserImp{
     @Getter
     String LOGIN;
     @Getter
