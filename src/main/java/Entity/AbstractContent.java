@@ -9,7 +9,6 @@ import javax.persistence.MappedSuperclass;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @MappedSuperclass
-@ToString
 abstract class AbstractContent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,5 +33,16 @@ abstract class AbstractContent {
         this.size = size;
         this.link = link;
         this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        return "AbstractContent{" +
+                "id=" + id +
+                ", name = '" + name + '\'' +
+                ", size = " + size +
+                ", link = '" + link + '\'' +
+                ", content = '" + content + '\'' +
+                "}\n";
     }
 }

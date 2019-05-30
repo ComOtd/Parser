@@ -26,11 +26,13 @@ public class ProxyChecker {
         }
     }
     public void checkProxyAndSaveToFile(List<String> list){
-       List<String> proxylist = list.parallelStream()
+        System.out.println("Проверка");
+        List<String> proxylist = list.parallelStream()
                 .map(ProxyUtil::stringToProxy)
                 .filter(this::checkProxy)
                 .map(Proxy::toString)
                 .collect(Collectors.toList());
-        FileProcessor.wrihtListToFile(proxylist,"src/tmp/out.txt");
+        System.out.println("Сохранение в файл");
+        FileProcessor.writListToFile(proxylist,"src/tmp/out.txt");
     }
 }

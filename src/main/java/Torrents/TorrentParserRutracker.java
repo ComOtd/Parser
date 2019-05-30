@@ -1,6 +1,7 @@
 package Torrents;
 
 import Entity.Content;
+import Utils.FileProcessor;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.jsoup.Connection;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static Proxy.ProxyUtil.proxyFileToList;
+
 
 @FieldDefaults(makeFinal=true, level= AccessLevel.PRIVATE)
 @AllArgsConstructor
@@ -26,14 +29,15 @@ enum ContentType {
 
 public class TorrentParserRutracker extends TorrentParserImp {
     
-    public TorrentParserRutracker(String LOGIN, String PASSWORD, List<Proxy> proxy, String content) {
-        super(LOGIN, PASSWORD, proxy, content);
+    public TorrentParserRutracker(String LOGIN, String PASSWORD, String content) {
+        super(LOGIN, PASSWORD, content);
     }
 
     @Override
     public Map<String, String> getLoginCookies() {
         Connection.Response response = null;
-        for (Proxy proxy : getProxy()) {
+        List<Proxy> proxies = proxyFileToList("src/tmp/out.txt");
+        for (Proxy proxy : proxies) {
            try {
                response = Jsoup.connect("https://rutracker.org/forum/login.php")
                        .proxy(proxy)
@@ -45,27 +49,31 @@ public class TorrentParserRutracker extends TorrentParserImp {
                        .execute();
                         break;
            }catch (IOException e){System.out.println(proxy);
-               System.out.println(e.getMessage());
-               System.out.println("Exception was processed. Program continues");
+                System.out.println(e.getMessage());
+                System.out.println("Exception was processed. Program getLoginCookies continues");
+                FileProcessor.removeLine(proxy.toString(),"src/tmp/out.txt");
+
            }
         }
         return response.cookies();
     }
 
     @Override
-    public Document getSerchPage(String findWord) {
+    public Document getSerchPage(String findWord, Map<String, String> cookies) {
         Document doc = null;
-        for (Proxy proxy : getProxy()) {
+        List<Proxy> proxies = proxyFileToList("src/tmp/out.txt");
+        for (Proxy proxy :proxies) {
             try {
         String url = ContentType.valueOf(getContent()).getTitle() + findWord;
                 doc = Jsoup.connect(url)
                 .proxy(proxy)
-                .cookies(getLoginCookies())
+                .cookies(cookies)
                 .get();
                 break;
             }catch (IOException e){System.out.println(proxy);
                 System.out.println(e.getMessage());
                 System.out.println("Exception was processed. Program continues");
+                FileProcessor.removeLine(proxy.toString(),"src/tmp/out.txt");
             }
         }return doc;
     }
@@ -76,11 +84,12 @@ public class TorrentParserRutracker extends TorrentParserImp {
         List<Content> contents = new ArrayList<>();
         for(Element element : elements){
             String name = element.select("a[class = med tLink hl-tags bold]").text();
+            name = name.substring(0, name.indexOf("("));
             String fsize = element.select("a[class = small tr-dl dl-stub]").text()
                     .replaceAll("↓|[a-zA-Z]+", "");
             String link = "https://rutracker.org/forum/" + element.select("a[class = med tLink hl-tags bold]")
                     .attr("href");
-            if (fsize.isEmpty()) continue;
+            if (fsize.isEmpty()|name.isEmpty()|link.isEmpty()) continue;
             double size = Double.parseDouble(fsize);
             if (size < maxSize) contents.add(new Content(name, size, link, getContent()));
         }

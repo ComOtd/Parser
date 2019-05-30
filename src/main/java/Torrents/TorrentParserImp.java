@@ -6,9 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.jsoup.nodes.Document;
-
 import java.io.IOException;
-import java.net.Proxy;
 import java.util.List;
 import java.util.Map;
 
@@ -20,11 +18,9 @@ public abstract class TorrentParserImp{
     @Getter
     String PASSWORD;
     @Getter
-    List<Proxy> proxy;
-    @Getter
     String content;
 
     public abstract Map<String,String> getLoginCookies() throws IOException;
-    public abstract Document getSerchPage(String findWord)throws IOException;
+    public abstract Document getSerchPage(String findWord, Map<String, String> cookies)throws IOException;
     public abstract List<Content> parsPage(Document doc, double maxSize);
 }

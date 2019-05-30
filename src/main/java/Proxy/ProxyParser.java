@@ -35,6 +35,7 @@ public class ProxyParser {
 
     public List<String> parseByUrl(List<String> urls) {
         Pattern patternIP = Pattern.compile(regex);
+        System.out.println("Парсинг");
         return urls.parallelStream().map(url ->{
             try {
                 return Jsoup.connect(url).get();
@@ -47,6 +48,7 @@ public class ProxyParser {
                 .flatMap(text -> patternIP.matcher(text).results())
                 .map(MatchResult::group)
                 .distinct()
+                .limit(50)
                 .map(text -> text + "\tHTTP")
                 .collect(Collectors.toList());
     }
