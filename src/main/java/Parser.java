@@ -6,9 +6,12 @@ import org.jsoup.nodes.Document;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class Parser {
@@ -25,7 +28,7 @@ public class Parser {
         }
 
 
-        double flashSize = 14;
+        double flashSize = 20;
         String content = "Film";
 
         switch (param) {
@@ -69,6 +72,28 @@ public class Parser {
                 timeSpent = System.currentTimeMillis() - startTime;
                 System.out.println("Программа выполнялась " + (timeSpent/1000) + " секунд");
                 break;
+            case "3":
+                startTime = System.currentTimeMillis();
+                System.out.println("РЕЖИМ ТОРРЕНТ ИЗ ФАЙЛА");
+                List<String> list = null;
+                try {
+                    list = Files.lines(Paths.get("src/tmp/file.txt")).collect(Collectors.toList());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                rutracker = new TorrentParserRutracker("SOsipov", "wHRx8", content);
+                cookies = rutracker.getLoginCookies();
+                contents =null;
+                for (String s : list) {
+                    System.out.println("ПОИСК: " + s);
+                    doc = rutracker.getSerchPage(findWord, cookies);
+                    contents = rutracker.parsPage(doc, flashSize);
+                }
+                System.out.println(contents);
+
+                timeSpent = System.currentTimeMillis() - startTime;
+               System.out.println("Программа выполнялась " + (timeSpent/1000) + " секунд");
+               break;
             default:
         }
     }}

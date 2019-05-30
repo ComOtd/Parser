@@ -84,7 +84,7 @@ public class TorrentParserRutracker extends TorrentParserImp {
         List<Content> contents = new ArrayList<>();
         for(Element element : elements){
             String name = element.select("a[class = med tLink hl-tags bold]").text();
-            name = name.substring(0, name.indexOf("("));
+            name = name.substring(0, name.indexOf("]")+1);
             String fsize = element.select("a[class = small tr-dl dl-stub]").text()
                     .replaceAll("↓|[a-zA-Z]+", "");
             String link = "https://rutracker.org/forum/" + element.select("a[class = med tLink hl-tags bold]")

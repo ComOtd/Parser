@@ -37,12 +37,9 @@ abstract class AbstractContent {
 
     @Override
     public String toString() {
-        return "AbstractContent{" +
-                "id=" + id +
-                ", name = '" + name + '\'' +
-                ", size = " + size +
+        return  "name = '" + name + '\'' + "\n"+
+                "size = " + size +
                 ", link = '" + link + '\'' +
-                ", content = '" + content + '\'' +
-                "}\n";
+                ", content = '" + content + '\''+ "\n";
     }
 }
