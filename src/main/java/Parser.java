@@ -41,12 +41,12 @@ public class Parser {
                 urls.add("http://free-proxy-server.net/");
 
                 ProxyParser proxyParser = new ProxyParser(0);
-                ProxyChecker checker = new ProxyChecker("https://telegram.org/");
+                ProxyChecker checker = new ProxyChecker("https://rutracker.org/forum/");
                 List<String> parsedProxy = proxyParser.parseByUrl(urls);
                 checker.checkProxyAndSaveToFile(parsedProxy);
 
                 long timeSpent = System.currentTimeMillis() - startTime;
-                System.out.println("Программа выполнялась " + (timeSpent/1000) + " секунд");
+                System.out.println("\nПрограмма выполнялась " + (timeSpent/1000) + " секунд");
                 break;
 
             case "2":
@@ -75,7 +75,7 @@ public class Parser {
             case "3":
                 startTime = System.currentTimeMillis();
                 System.out.println("РЕЖИМ ТОРРЕНТ ИЗ ФАЙЛА");
-                List<String> list = null;
+                List<String> list = new ArrayList<>();
                 try {
                     list = Files.lines(Paths.get("src/tmp/file.txt")).collect(Collectors.toList());
                 } catch (IOException e) {
@@ -83,7 +83,7 @@ public class Parser {
                 }
                 rutracker = new TorrentParserRutracker("SOsipov", "wHRx8", content);
                 cookies = rutracker.getLoginCookies();
-                contents =null;
+                contents = new ArrayList<>();
                 for (String s : list) {
                     System.out.println("ПОИСК: " + s);
                     doc = rutracker.getSerchPage(findWord, cookies);
@@ -92,7 +92,7 @@ public class Parser {
                 System.out.println(contents);
 
                 timeSpent = System.currentTimeMillis() - startTime;
-               System.out.println("Программа выполнялась " + (timeSpent/1000) + " секунд");
+               System.out.println("\nПрограмма выполнялась " + (timeSpent/1000) + " секунд");
                break;
             default:
         }

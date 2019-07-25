@@ -14,6 +14,7 @@ import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static Proxy.ProxyUtil.proxyFileToList;
 
@@ -39,7 +40,7 @@ public class TorrentParserRutracker extends TorrentParserImp {
         List<Proxy> proxies = proxyFileToList("src/tmp/out.txt");
         for (Proxy proxy : proxies) {
            try {
-               response = Jsoup.connect("https://rutracker.org/forum/login.php")
+                response = Jsoup.connect("https://rutracker.org/forum/login.php")
                        .proxy(proxy)
                        .referrer("https://rutracker.org/forum/login.php")
                        .data("login_username", getLOGIN())
@@ -55,7 +56,7 @@ public class TorrentParserRutracker extends TorrentParserImp {
 
            }
         }
-        return response.cookies();
+        return Objects.requireNonNull(response).cookies();
     }
 
     @Override
