@@ -48,7 +48,7 @@ public class ProxyParser {
                 .flatMap(text -> patternIP.matcher(text).results())
                 .map(MatchResult::group)
                 .distinct()
-                .limit(50)
+                .limit(100)
                 .map(text -> text + "\tHTTP")
                 .collect(Collectors.toList());
     }

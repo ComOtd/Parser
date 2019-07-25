@@ -41,7 +41,7 @@ public class Parser {
                 urls.add("http://free-proxy-server.net/");
 
                 ProxyParser proxyParser = new ProxyParser(0);
-                ProxyChecker checker = new ProxyChecker("https://rutracker.org");
+                ProxyChecker checker = new ProxyChecker("https://telegram.org/");
                 List<String> parsedProxy = proxyParser.parseByUrl(urls);
                 checker.checkProxyAndSaveToFile(parsedProxy);
 

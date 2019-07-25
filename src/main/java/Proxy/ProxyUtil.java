@@ -32,12 +32,13 @@ public class ProxyUtil {
 
     static Proxy stringToProxy(String string){
         Pattern hostPattern = Pattern.compile("\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}");
-        Pattern portPattern = Pattern.compile(":\\d{2,4}");
+        Pattern portPattern = Pattern.compile(":(\\d{2,4})");
         Pattern typePattern = Pattern.compile("[A-Z]{4,5}");
 
         String pHost = hostPattern.matcher(string).results().map(MatchResult::group).collect(Collectors.joining());
-        String pPort = portPattern.matcher(string).results().map(MatchResult::group)
-                .map(text -> text.replace(":", ""))
+        String pPort = portPattern.matcher(string)
+                .results()
+                .map(MatchResult -> MatchResult.group(1))
                 .collect(Collectors.joining());
         int port = Integer.parseInt(pPort);
         String pType = typePattern.matcher(string).results().map(MatchResult::group).collect(Collectors.joining());

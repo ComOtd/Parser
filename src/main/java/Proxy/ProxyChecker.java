@@ -16,7 +16,7 @@ public class ProxyChecker {
            urlConnection = (HttpURLConnection) url.openConnection(proxy);
            urlConnection.setConnectTimeout(5000);
            urlConnection.connect();
-           System.out.println(proxy + " OK");
+           if(urlConnection.getResponseCode() == 200) System.out.println(proxy + " OK");
            return (urlConnection.getResponseCode() == 200);
         } catch(Exception e) {
             System.out.println(proxy + " Error " + e);
